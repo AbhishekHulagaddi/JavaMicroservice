@@ -1,0 +1,69 @@
+server:
+  port: 9201
+
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    config-url: /auth/v3/api-docs/swagger-config
+    url: /auth/v3/api-docs
+
+spring:
+  application:
+    name: auth-service
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/tls_auth?useSSL=false&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # create | update | validate | none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: myjavaapp@gmail.com
+    password: hshshsften2njdndj
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+
+mail:
+  status: true
+  from: myjavaapp@gmail.com      
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+jwt:
+  secret: VERY_STRONG_SECRET_256_BIT_CHANGE_12345678901234567890
+  access:
+    exp: 900000        # 15 min
+  refresh:
+    exp: 604800000     # 7 days
+    
+gateway:
+  base-url: http://localhost:9200
+
+
+
+

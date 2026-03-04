@@ -1,0 +1,15 @@
+server:
+  port: 7203
+
+keycloak:
+  realm: DMS
+  auth-server-url: http://keycloak:8080     
+  client-id: spring-gateway
+  client-secret: HugeKVdhGhzp4ZO4KCDsOOwUJG49KqAo
+  id: 4f7ffab9-f817-41b2-933f-67a26789874e
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    config-url: /auth/v3/api-docs/swagger-config
+    url: /auth/v3/api-docs

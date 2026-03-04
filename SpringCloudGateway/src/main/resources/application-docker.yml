@@ -1,0 +1,42 @@
+server:
+  port: 7200
+
+spring:
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      routes:
+        - id: dms-service
+          uri: http://documentservice:7201/
+          predicates:
+            - Path=/dms/**
+          filters:
+            - StripPrefix=1
+            - AddRequestHeader=X-Gateway-Auth, U2FsdGVkX18+v6HF0j5z/kM+Kwo/f0Dzvah2Wa1GQPmimWKLdaL51e4FkNFDSvL14mfWRoSlSAVRqvcK08M4WGUnwUa6gKkHqL9mUoT0tNw=
+            - JwtUsernameHeaderFilter
+
+        - id: dotnet-service
+          uri: http://dotnet:7202/
+          predicates:
+            - Path=/dotnet/**
+          filters:
+            - StripPrefix=1
+
+        - id: auth-service
+          uri: http://authservice:7203/
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/DMS
+
+permissions:
+  api:
+    url: http://authservice:7203/accesspolicy/permissions/check
