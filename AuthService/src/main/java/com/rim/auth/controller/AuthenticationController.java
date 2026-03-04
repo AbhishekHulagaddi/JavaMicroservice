@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rim.auth.model.CreateUserModel;
 import com.rim.auth.model.ForgotPasswordRequest;
 import com.rim.auth.model.LoginRequest;
 import com.rim.auth.model.OTPRequest;
@@ -33,7 +34,10 @@ public class AuthenticationController {
 	    public Map<String,Object> signIn(@RequestBody LoginRequest req){
 	        return authService.signIn(req);
 	    }
-
+	    @PostMapping(WebConstantUrl.SIGN_UP)
+	    public Map<String, Object> createUser(@RequestBody CreateUserModel model) {
+	        return authService.signUp(model);
+	    }
 	    @PostMapping(WebConstantUrl.FORGOT_PASSWORD)
 	    public Map<String,Object> forgot(@RequestBody ForgotPasswordRequest req){
 	        return authService.forgotPassword(req);

@@ -82,21 +82,21 @@ public class AuthUserServiceImpl implements AuthUserService{
 	     // -------------------------------
 	     // EMAIL & OTP VALIDATION
 	     // -------------------------------
-	     if (model.getOtp() == null) {
-	    	    return response(false, "Please Enter OTP sent to your Email!", null);
-	    	} else {
-
-	    	    Map<String,Object> resp =
-	    	            otpService.verifyOtp(email, model.getOtp().toString());
-
-	    	    Boolean status = (Boolean) resp.get("status");
-
-	    	    if (!status) {
-	    	        return response(false,
-	    	                resp.get("message").toString(),
-	    	                null);
-	    	    }
-	    	}
+//	     if (model.getOtp() == null) {
+//	    	    return response(false, "Please Enter OTP sent to your Email!", null);
+//	    	} else {
+//
+//	    	    Map<String,Object> resp =
+//	    	            otpService.verifyOtp(email, model.getOtp().toString());
+//
+//	    	    Boolean status = (Boolean) resp.get("status");
+//
+//	    	    if (!status) {
+//	    	        return response(false,
+//	    	                resp.get("message").toString(),
+//	    	                null);
+//	    	    }
+//	    	}
 	
 	     // -------------------------------
 	     // PASSWORD VALIDATION
@@ -279,8 +279,8 @@ public class AuthUserServiceImpl implements AuthUserService{
 
         int page = filter != null ? filter.getPage() : 0;
         int size = filter != null ? filter.getSize() : 10;
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        int pageNumber = Math.max(page - 1, 0);
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt").descending());
 
         Specification<User> spec = UserSpecification.filter(filter);
 

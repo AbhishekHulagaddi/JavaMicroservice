@@ -28,6 +28,7 @@ public interface WebConstantUrl {
 
 	public static final String REGISTER = "/register";
 	public static final String SIGN_IN="/signin";
+	public static final String SIGN_UP="/signup";
 	public static final String LOGOUT="/logout";
 	public static final String FORGOT_PASSWORD="/forgotPassword";
 	public static final String RESET_PASSWORD="/resetPassword";

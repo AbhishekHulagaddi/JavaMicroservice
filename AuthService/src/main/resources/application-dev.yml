@@ -32,8 +32,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: myjavaapp@gmail.com
-    password: hshshsften2njdndj
+    username: rimglobaltest@gmail.com
+    password: hxgnnzeigzzsvqjo
     properties:
       mail:
         smtp:
@@ -48,7 +48,7 @@ spring:
 
 mail:
   status: true
-  from: myjavaapp@gmail.com      
+  from: rimglobaltest@gmail.com     
 
 logging:
   level:

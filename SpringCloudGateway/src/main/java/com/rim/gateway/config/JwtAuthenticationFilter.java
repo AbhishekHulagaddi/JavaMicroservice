@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             "/auth/authenticate/forgot-password",
             "/auth/authenticate/reset-password",
             "/auth/authenticate/generateOtp",
-            "/auth/user/create",
+            "/auth/authenticate/signup",
             
            
 
@@ -179,7 +179,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         // /user/create → ["", "user", "create"]
         if (parts.length > 1) {
-            return parts[1].toUpperCase();
+            return parts[2].toUpperCase();
         }
 
         return null;
@@ -202,12 +202,16 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     
     private Mono<Boolean> checkPermission(String role, String resource, String scope) {
 
-        String url = authServiceUrl + "/auth/permission/check";
+        String url = authServiceUrl + "/permission/check";
 
         PermissionModel body = new PermissionModel();
         body.setRoleName(role);
         body.setResourceName(resource);
         body.setScopeName(scope);
+        //grant permission for logout API
+        if(resource.equalsIgnoreCase("authenticate")&&scope.equalsIgnoreCase("logout")) {
+        	 return Mono.just(true);
+        }
 
         return webClient.post()
                 .uri(url)

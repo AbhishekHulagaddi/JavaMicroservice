@@ -50,10 +50,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 // 🔓 AUTH APIs
-                .requestMatchers("/auth/authenticate/create").permitAll()
+                .requestMatchers("/user/create").permitAll()
                 
                 // 🔓 Temp permit
-                .requestMatchers("/auth/role/**").permitAll()
+                .requestMatchers("/role/**").permitAll()
                 
                 // 🔓 SWAGGER
                 .requestMatchers(

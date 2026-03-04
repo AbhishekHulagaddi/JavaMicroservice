@@ -10,21 +10,27 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.rim.auth.domain.PasswordResetToken;
 import com.rim.auth.domain.RefreshToken;
+import com.rim.auth.domain.Role;
 import com.rim.auth.domain.User;
+import com.rim.auth.mapper.AuthUserMapper;
 import com.rim.auth.model.AuthResponse;
+import com.rim.auth.model.CreateUserModel;
 import com.rim.auth.model.ForgotPasswordRequest;
 import com.rim.auth.model.LoginRequest;
 import com.rim.auth.model.RefreshTokenRequest;
 import com.rim.auth.model.ResetPasswordRequest;
+import com.rim.auth.repo.AuthRoleRepo;
 import com.rim.auth.repo.AuthUserRepo;
 import com.rim.auth.repo.PasswordResetTokenRepo;
 import com.rim.auth.repo.RefreshTokenRepo;
 import com.rim.auth.service.AuthenticationService;
 import com.rim.auth.utils.GatewayConfig;
 import com.rim.auth.utils.JwtUtil;
+import com.rim.auth.utils.OtpService;
 
 import jakarta.transaction.Transactional;
 @Service
@@ -48,6 +54,16 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     
     @Autowired
     private GatewayConfig gatewayConfig;
+    
+    @Autowired
+    private AuthUserMapper authUserMapper;
+
+    @Autowired
+    private AuthRoleRepo authRoleRepo;
+    
+    @Autowired
+    private OtpService otpService;
+    
 
 
 
@@ -59,6 +75,96 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         map.put("data",data);
         return map;
     }
+    
+    
+	 // =====================================================
+	 // SIGNUP USER
+	 // =====================================================
+	 @Override
+	 public Map<String, Object> signUp (CreateUserModel model) {
+	
+	     // -------------------------------
+	     // NULL CHECK
+	     // -------------------------------
+	     if (model == null)
+	         return response(false, "Request body missing", null);
+	
+	     // -------------------------------
+	     // EMAIL VALIDATION
+	     // -------------------------------
+	     if (!StringUtils.hasText(model.getEmail()))
+	         return response(false, "Email is required", null);
+	
+	     String email = model.getEmail().trim().toLowerCase();
+	
+	     if (userRepo.existsByEmailIgnoreCase(email))
+	         return response(false, "Email already exists", null);
+	     // -------------------------------
+	     // EMAIL & OTP VALIDATION
+	     // -------------------------------
+	     if (model.getOtp() == null) {
+	    	    return response(false, "Please Enter OTP sent to your Email!", null);
+	    	} else {
+
+	    	    Map<String,Object> resp =
+	    	            otpService.verifyOtp(email, model.getOtp().toString());
+
+	    	    Boolean status = (Boolean) resp.get("status");
+
+	    	    if (!status) {
+	    	        return response(false,
+	    	                resp.get("message").toString(),
+	    	                null);
+	    	    }
+	    	}
+	
+	     // -------------------------------
+	     // PASSWORD VALIDATION
+	     // -------------------------------
+	     if (!StringUtils.hasText(model.getPassword()))
+	         return response(false, "Password is required", null);
+	
+	     if (!StringUtils.hasText(model.getConfirmPassword()))
+	         return response(false, "Confirm password is required", null);
+	
+	     if (!model.getPassword().equals(model.getConfirmPassword()))
+	         return response(false, "Password and Confirm Password mismatch", null);
+	
+	     // password length check
+	     if (model.getPassword().length() < 6)
+	         return response(false, "Password must be at least 6 characters", null);
+	
+	     // -------------------------------
+	     // ROLE VALIDATION
+	     // -------------------------------
+	     if (model.getRoleId() == null)
+	         return response(false, "RoleId is required", null);
+	
+	     Optional<Role> roleOpt = authRoleRepo.findById(model.getRoleId());
+	     if (roleOpt.isEmpty())
+	         return response(false, "Role not found", null);
+	
+	     Role role = roleOpt.get();
+	
+	     // -------------------------------
+	     // PASSWORD ENCODE
+	     // -------------------------------
+	     String encodedPassword = passwordEncoder.encode(model.getPassword());
+	
+	     // -------------------------------
+	     // MAP TO ENTITY
+	     // -------------------------------
+	     User user = authUserMapper.toDomain(model, role, encodedPassword);
+	     user.setCreatedAt(LocalDateTime.now());
+	     user.setEmailVerified(true);
+	     userRepo.save(user);
+	
+	     return response(true, "User created successfully", authUserMapper.toModel(user));
+	 }
+
+    
+    
+    
 
     // =====================================================
     // SIGN IN
